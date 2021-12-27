@@ -128,7 +128,7 @@ def json_stringify(obj: object, indent: Union[int, None] = None) -> str:
     return json.dumps(obj, indent=indent, cls=EnhancedJSONEncoder, ensure_ascii=False)
 
 
-def write(file: str | Path, text: str) -> None:
+def write(file: Union[str, Path], text: str) -> None:
     """
     Write text to a file
 
@@ -146,7 +146,7 @@ def write(file: str | Path, text: str) -> None:
         f.write(text)
 
 
-def read(file: str | Path) -> str:
+def read(file: Union[str, Path]) -> str:
     """
     Read file content
 
