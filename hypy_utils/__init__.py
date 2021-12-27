@@ -3,6 +3,7 @@ __version__ = "1.0.0"
 import dataclasses
 import json
 from datetime import datetime, date
+from pathlib import Path
 from typing import Union
 
 
@@ -125,3 +126,34 @@ def json_stringify(obj: object, indent: Union[int, None] = None) -> str:
     :return: Json strings
     """
     return json.dumps(obj, indent=indent, cls=EnhancedJSONEncoder, ensure_ascii=False)
+
+
+def write(file: str | Path, text: str) -> None:
+    """
+    Write text to a file
+
+    Preconditions:
+        - file != ''
+
+    :param file: File path (will be converted to lowercase)
+    :param text: Text
+    :return: None
+    """
+    file = Path(file)
+    file.parent.mkdir(parents=True, exist_ok=True)
+
+    with file.open('w', encoding='utf-8') as f:
+        f.write(text)
+
+
+def read(file: str | Path) -> str:
+    """
+    Read file content
+
+    Preconditions:
+        - file != ''
+
+    :param file: File path (will be converted to lowercase)
+    :return: None
+    """
+    return file.read_text('utf-8')
