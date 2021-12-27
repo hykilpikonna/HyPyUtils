@@ -50,3 +50,33 @@ def printc(msg: str):
     :param msg: Message with minecraft color codes
     """
     print(color(msg + '&r'))
+
+
+def parse_date_time(iso: str) -> datetime:
+    """
+    Parse date faster. Running 1,000,000 trials, this parse_date function is 4.03 times faster than
+    python's built-in dateutil.parser.isoparse() function.
+
+    Preconditions:
+        - iso is the output of datetime.isoformat() (In a format like "2021-10-20T23:50:14")
+        - iso is a valid date (this function does not check for the validity of the input)
+
+    :param iso: Input date
+    :return: Datetime object
+    """
+    return datetime(int(iso[:4]), int(iso[5:7]), int(iso[8:10]),
+                    int(iso[11:13]), int(iso[14:16]), int(iso[17:19]))
+
+
+def parse_date_only(iso: str) -> datetime:
+    """
+    Parse date faster.
+
+    Preconditions:
+        - iso starts with the format of "YYYY-MM-DD" (e.g. "2021-10-20" or "2021-10-20T10:04:14")
+        - iso is a valid date (this function does not check for the validity of the input)
+
+    :param iso: Input date
+    :return: Datetime object
+    """
+    return datetime(int(iso[:4]), int(iso[5:7]), int(iso[8:10]))
