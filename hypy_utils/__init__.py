@@ -1,6 +1,7 @@
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 import dataclasses
+import hashlib
 import json
 from datetime import datetime, date
 from pathlib import Path
@@ -157,3 +158,18 @@ def read(file: Union[str, Path]) -> str:
     :return: None
     """
     return file.read_text('utf-8')
+
+
+def md5(file: Union[str, Path]) -> str:
+    """
+    Compute md5 of a file
+
+    :param file: File path
+    :return: md5 string
+    """
+    file = Path(file)
+    hash_md5 = hashlib.md5()
+    with open(file, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
