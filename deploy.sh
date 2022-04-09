@@ -5,7 +5,8 @@ set -e
 VERSION=$(python3 -c 'import hypy_utils; print(hypy_utils.__version__)')
 echo "$VERSION"
 
-rm dist/*
+mkdir -p dist
+rm -rf dist/*
 
 # Build
 python3 setup.py sdist bdist_wheel

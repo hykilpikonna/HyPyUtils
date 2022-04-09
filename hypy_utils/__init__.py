@@ -1,8 +1,9 @@
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 import dataclasses
 import hashlib
 import json
+import time
 from datetime import datetime, date
 from pathlib import Path
 from typing import Union
@@ -173,3 +174,22 @@ def md5(file: Union[str, Path]) -> str:
         for chunk in iter(lambda: f.read(4096), b""):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
+
+
+class Timer:
+    start: int
+
+    def __init__(self):
+        self.reset()
+
+    def elapsed(self, reset: bool = True) -> float:
+        t = (time.time_ns() - self.start) / 1000000
+        if reset:
+            self.reset()
+        return t
+
+    def log(self, *args):
+        print(f'{self.elapsed():.0f}ms', *args)
+
+    def reset(self):
+        self.start = time.time_ns()
