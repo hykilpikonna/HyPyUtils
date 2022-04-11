@@ -1,4 +1,7 @@
-__version__ = "1.0.5"
+from __future__ import annotations
+
+
+__version__ = "1.0.6"
 
 import dataclasses
 import hashlib
