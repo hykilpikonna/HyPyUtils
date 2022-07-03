@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import io
 import pickle
 
@@ -6,7 +8,11 @@ def pickle_encode(obj: any, protocol=None, fix_imports=True) -> bytes:
     """
     Encode object to pickle bytes
 
-    >>> by = pickle_encode({'meow': 565656})
+    >>> by = pickle_encode({'function': pickle_encode})
+    >>> len(by)
+    57
+    >>> decoded = pickle_decode(by)
+    >>> by = decoded['function']({'meow': 565656})
     >>> pickle_decode(by)
     {'meow': 565656}
     """

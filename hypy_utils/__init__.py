@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-__version__ = "1.0.7"
+__version__ = "1.0.8"
 
 import dataclasses
 import hashlib
@@ -8,7 +8,7 @@ import json
 import time
 from datetime import datetime, date
 from pathlib import Path
-from typing import Union
+from typing import Union, Callable
 
 
 def ansi_rgb(r: int, g: int, b: int, foreground: bool = True) -> str:
@@ -202,3 +202,16 @@ class Timer:
 
     def reset(self):
         self.start = time.time_ns()
+
+
+def mem(var: str):
+    print(f'Memory usage for {var}: {eval(f"sys.getsizeof({var})") / 1024:.1f}KB')
+
+
+def run_time(func: Callable, *args, **kwargs):
+    name = getattr(func, '__name__', 'function')
+    start = time.time_ns()
+    iter = kwargs.pop('iter', 10)
+    _ = [func(*args, **kwargs) for _ in range(iter)]
+    ms = (time.time_ns() - start) / 1e6
+    print(f'RT {name:30} {ms:6.1f} ms')
