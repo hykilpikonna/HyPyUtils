@@ -3,6 +3,7 @@ Importing this file requires installing tqdm.
 """
 from __future__ import annotations
 
+import os
 from functools import partial
 from typing import Callable, Iterable
 
