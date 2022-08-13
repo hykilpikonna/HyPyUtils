@@ -29,3 +29,20 @@ def camel_split(camel: str) -> list[str]:
 
     # for "lUl", index of "U" will pop twice, have to filter that
     return [camel[x:y] for x, y in zip(word, word[1:]) if x < y]
+
+
+def substr_between(s: str, start: str | None = None, end: str | None = None):
+    """
+    Get substring between two strings
+    
+    :param s: E.g. "Foo abc Bar" 
+    :param start: E.g. "Foo"
+    :param end: E.g. "Bar"
+    :return: E.g. " abc "
+    """
+    if start:
+        s = s[s.index(start) + len(start):]
+    if end:
+        s = s[:s.index(end)]
+    return s
+
