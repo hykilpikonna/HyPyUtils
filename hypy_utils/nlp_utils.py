@@ -34,15 +34,12 @@ def camel_split(camel: str) -> list[str]:
 def substr_between(s: str, start: str | None = None, end: str | None = None):
     """
     Get substring between two strings
-    
-    :param s: E.g. "Foo abc Bar" 
-    :param start: E.g. "Foo"
-    :param end: E.g. "Bar"
-    :return: E.g. " abc "
+
+    >>> substr_between('abc { meow } def', '{', '}')
+    ' meow '
     """
     if start:
         s = s[s.index(start) + len(start):]
     if end:
         s = s[:s.index(end)]
     return s
-
