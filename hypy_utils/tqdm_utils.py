@@ -22,7 +22,7 @@ def pmap(fn: Callable, lst: Iterable, *args, **kwargs) -> list:
 
 def tmap(fn: Callable, lst: Iterable, *args, **kwargs) -> list:
     tqdm_args = dict(position=0, leave=True, chunksize=1, tqdm_class=tqdm.tqdm, max_workers=os.cpu_count())
-    return process_map(fn, lst, *args, **{**tqdm_args, **kwargs})
+    return thread_map(fn, lst, *args, **{**tqdm_args, **kwargs})
 
 
 def tq(it: Iterable, desc: str, *args, **kwargs) -> tqdm:
