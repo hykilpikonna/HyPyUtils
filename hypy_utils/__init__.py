@@ -9,6 +9,7 @@ import time
 from datetime import datetime, date
 from pathlib import Path
 from typing import Union, Callable
+from types import SimpleNamespace
 
 
 def ansi_rgb(r: int, g: int, b: int, foreground: bool = True) -> str:
@@ -111,6 +112,10 @@ class EnhancedJSONEncoder(json.JSONEncoder):
         # https://stackoverflow.com/a/51286749/7346633
         if dataclasses.is_dataclass(o):
             return dataclasses.asdict(o)
+        
+        # Simple namespace
+        if isinstance(o, SimpleNamespace):
+            return o.__dict__
 
         # Support encoding datetime
         if isinstance(o, (datetime, date)):
@@ -137,6 +142,10 @@ def json_stringify(obj: object, indent: Union[int, None] = None) -> str:
     :return: Json strings
     """
     return json.dumps(obj, indent=indent, cls=EnhancedJSONEncoder, ensure_ascii=False)
+
+
+def jsn(s: str):
+    return json.loads(s, object_hook=lambda d: SimpleNamespace(**d))
 
 
 def write(file: Union[str, Path], text: str) -> None:
