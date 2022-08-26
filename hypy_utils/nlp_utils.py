@@ -1,6 +1,7 @@
 """
 Natual language processing utils
 """
+from __future__ import annotations
 
 
 def camel_split(camel: str) -> list[str]:
