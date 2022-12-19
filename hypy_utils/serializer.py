@@ -8,7 +8,7 @@ import inspect
 import io
 import json
 import pickle
-from enum import EnumType, Enum
+from enum import Enum
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
@@ -91,9 +91,9 @@ class ForceJSONEcoder(EnhancedJSONEncoder):
         if infer_result:
             return infer_result
 
-        # Support EnumType
-        if isinstance(o, EnumType):
-            return {i.name: i.value for i in o}
+        # # Support EnumType
+        # if isinstance(o, EnumType):
+        #     return {i.name: i.value for i in o}
 
         # Support for custom classes (get dict values)
         if hasattr(o, '__dict__') and not inspect.isclass(o):
