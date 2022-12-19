@@ -1,3 +1,5 @@
+from hypy_utils import infer
+
 
 def is_non_empty(o):
     return not hasattr(o, '__len__') or len(o) > 0
@@ -61,3 +63,24 @@ def remove_keys(d: dict | list, keys: set) -> dict | list:
         return d
 
     return d
+
+
+def deep_dict(o: object, exclude: set | None):
+    """
+    Recursively convert an object into a dictionary
+
+    :param o: Object
+    :param exclude: Keys to exclude
+    :return: Deep dictionary of the object's variables
+    """
+    exclude = exclude or {}
+    infer_result = infer(o)
+    if infer_result:
+        return infer_result
+    if hasattr(o, '__dict__'):
+        return deep_dict(dict(vars(o)), exclude)
+    if isinstance(o, dict):
+        return {k: deep_dict(v, exclude) for k, v in o.items() if k not in exclude}
+    if isinstance(o, list):
+        return [deep_dict(v, exclude) for v in o]
+    return o
