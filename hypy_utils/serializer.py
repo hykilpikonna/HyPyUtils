@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import dataclasses
 import datetime
 import hashlib
@@ -41,7 +42,6 @@ class EnhancedJSONEncoder(json.JSONEncoder):
     An improvement to the json.JSONEncoder class, which supports:
     encoding for dataclasses, encoding for datetime, and sets
     """
-
     def default(self, o: object) -> object:
 
         # Support encoding dataclasses
@@ -62,10 +62,31 @@ class EnhancedJSONEncoder(json.JSONEncoder):
         if isinstance(o, set):
             return list(o)
 
+        # Support for Path
+        if isinstance(o, Path):
+            return str(o)
+
         return super().default(o)
 
 
-def json_stringify(obj: object, **kwargs) -> str:
+class ForceJSONEcoder(EnhancedJSONEncoder):
+    """
+    A json encoder that can serialize almost everything (including custom classes, byte arrays)
+    """
+    def default(self, o: object) -> object:
+
+        # Support for byte arrays (encode as base64 string)
+        if isinstance(o, bytes):
+            return base64.b64encode(o).decode()
+
+        # Support for custom classes (get dict values)
+        if hasattr(o, '__dict__'):
+            return vars(o)
+
+        return super().default(o)
+
+
+def json_stringify(obj: object, forced: bool = True, **kwargs) -> str:
     """
     Serialize json string with support for dataclasses and datetime and sets and with custom
     configuration.
@@ -74,9 +95,10 @@ def json_stringify(obj: object, **kwargs) -> str:
         - obj != None
 
     :param obj: Objects
+    :param forced: Whether to force the conversion of classes and byte arrays
     :return: Json strings
     """
-    args = dict(ensure_ascii=False, cls=EnhancedJSONEncoder)
+    args = dict(ensure_ascii=False, cls=ForceJSONEcoder if forced else EnhancedJSONEncoder)
     args.update(kwargs)
     return json.dumps(obj, **args)
 
@@ -131,8 +153,8 @@ def read(file: Path | str) -> str:
     return Path(file).read_text('utf-8')
 
 
-def write_json(fp: Path | str, data: Any):
-    write(fp, json_stringify(data))
+def write_json(fp: Path | str, data: Any, **kwargs):
+    write(fp, json_stringify(data, **kwargs))
 
 
 def parse_date_time(iso: str) -> datetime.datetime:
