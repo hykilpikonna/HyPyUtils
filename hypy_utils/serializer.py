@@ -4,9 +4,11 @@ import base64
 import dataclasses
 import datetime
 import hashlib
+import inspect
 import io
 import json
 import pickle
+from enum import EnumType, Enum
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
@@ -37,36 +39,47 @@ def pickle_decode(by: bytes) -> Any:
         return pickle.load(bio)
 
 
+def infer(o: object) -> object | None:
+    # Support encoding dataclasses
+    # https://stackoverflow.com/a/51286749/7346633
+    if dataclasses.is_dataclass(o):
+        return dataclasses.asdict(o)
+
+    # Simple namespace
+    if isinstance(o, SimpleNamespace):
+        return o.__dict__
+
+    # Support encoding datetime
+    if isinstance(o, (datetime.datetime, datetime.date)):
+        return o.isoformat()
+
+    # Support for sets
+    # https://stackoverflow.com/a/8230505/7346633
+    if isinstance(o, set):
+        return list(o)
+
+    # Support for Path
+    if isinstance(o, Path):
+        return str(o)
+
+    # Support for byte arrays (encode as base64 string)
+    if isinstance(o, bytes):
+        return base64.b64encode(o).decode()
+
+    # Enums
+    if isinstance(o, Enum):
+        return o.name
+
+    return None
+
+
 class EnhancedJSONEncoder(json.JSONEncoder):
     """
     An improvement to the json.JSONEncoder class, which supports:
     encoding for dataclasses, encoding for datetime, and sets
     """
     def default(self, o: object) -> object:
-
-        # Support encoding dataclasses
-        # https://stackoverflow.com/a/51286749/7346633
-        if dataclasses.is_dataclass(o):
-            return dataclasses.asdict(o)
-
-        # Simple namespace
-        if isinstance(o, SimpleNamespace):
-            return o.__dict__
-
-        # Support encoding datetime
-        if isinstance(o, (datetime.datetime, datetime.date)):
-            return o.isoformat()
-
-        # Support for sets
-        # https://stackoverflow.com/a/8230505/7346633
-        if isinstance(o, set):
-            return list(o)
-
-        # Support for Path
-        if isinstance(o, Path):
-            return str(o)
-
-        return super().default(o)
+        return infer(o) or super().default(o)
 
 
 class ForceJSONEcoder(EnhancedJSONEncoder):
@@ -74,14 +87,17 @@ class ForceJSONEcoder(EnhancedJSONEncoder):
     A json encoder that can serialize almost everything (including custom classes, byte arrays)
     """
     def default(self, o: object) -> object:
+        infer_result = infer(o)
+        if infer_result:
+            return infer_result
 
-        # Support for byte arrays (encode as base64 string)
-        if isinstance(o, bytes):
-            return base64.b64encode(o).decode()
+        # Support EnumType
+        if isinstance(o, EnumType):
+            return {i.name: i.value for i in o}
 
         # Support for custom classes (get dict values)
-        if hasattr(o, '__dict__'):
-            return vars(o)
+        if hasattr(o, '__dict__') and not inspect.isclass(o):
+            return dict(vars(o))
 
         return super().default(o)
 
