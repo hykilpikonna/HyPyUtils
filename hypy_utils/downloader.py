@@ -33,7 +33,7 @@ def download_file(url: str, file: str | Path):
 
     with open(file, 'wb') as f:
         pbar = tqdm.tqdm(unit=" MB", ncols=term_len,
-                         bar_format='{desc} {rate_fmt} {remaining} [{bar}] {percentage:.0f}%', ascii=' #',
+                         bar_format='{desc} {rate_noinv_fmt} {remaining} [{bar}] {percentage:.0f}%', ascii=' #',
                          desc=file.name[:bar_len].ljust(bar_len), **tqdm_args)
         for chunk in r.iter_content(chunk_size=chunk_size):
             if chunk:
