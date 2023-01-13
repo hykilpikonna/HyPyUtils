@@ -7,7 +7,7 @@ import requests
 import tqdm
 
 
-def download_file(url: str, file: str | Path):
+def download_file(url: str, file: str | Path, progress: bool = True):
     """
     Helper method handling downloading large files from `url` to `filename`.
     Returns a pointer to `filename`.
@@ -32,11 +32,16 @@ def download_file(url: str, file: str | Path):
         tqdm_args['total'] = int(r.headers['content-length']) / 1024 / 1024
 
     with open(file, 'wb') as f:
-        pbar = tqdm.tqdm(unit=" MB", ncols=term_len,
-                         bar_format='{desc} {rate_noinv_fmt} {remaining} [{bar}] {percentage:.0f}%', ascii=' #',
-                         desc=file.name[:bar_len].ljust(bar_len), **tqdm_args)
+        pbar = None
+        if progress:
+            pbar = tqdm.tqdm(unit=" MB", ncols=term_len,
+                             bar_format='{desc} {rate_noinv_fmt} {remaining} [{bar}] {percentage:.0f}%', ascii=' #',
+                             desc=file.name[:bar_len].ljust(bar_len), **tqdm_args)
+
         for chunk in r.iter_content(chunk_size=chunk_size):
             if chunk:
-                pbar.update(len(chunk) / 1024 / 1024)
+                if pbar:
+                    pbar.update(len(chunk) / 1024 / 1024)
                 f.write(chunk)
+
     return file
