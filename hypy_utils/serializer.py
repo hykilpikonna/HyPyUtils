@@ -119,8 +119,16 @@ def json_stringify(obj: object, forced: bool = True, **kwargs) -> str:
     return json.dumps(obj, **args)
 
 
-def jsn(s: str) -> SimpleNamespace:
-    return json.loads(s, object_hook=lambda d: SimpleNamespace(**d))
+class SafeNamespace(SimpleNamespace):
+    def __getattr__(self, attr):
+        try:
+            return super().__getattr__(attr)
+        except AttributeError:
+            return None
+
+
+def jsn(s: str) -> SafeNamespace:
+    return json.loads(s, object_hook=lambda d: SafeNamespace(**d))
 
 
 def ensure_dir(path: Path | str) -> Path:
