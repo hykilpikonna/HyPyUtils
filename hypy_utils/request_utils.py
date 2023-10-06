@@ -2,7 +2,7 @@ import requests
 
 
 def setup_proxy(session: requests.Session, addr: str = 'socks5://localhost:9050', verbose: bool = True):
-    url = 'https://ifconfig.me/ip'
+    url = 'https://ip.me'
 
     # Setup proxy
     ip = session.get(url).text.strip()
