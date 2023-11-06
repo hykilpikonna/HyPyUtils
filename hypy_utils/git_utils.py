@@ -19,7 +19,7 @@ class ExtractedCommit(NamedTuple):
         return dateutil.parser.isoparse(self.time)
 
 
-def git_log(path: Path, fail_silently: False) -> list[ExtractedCommit]:
+def git_log(path: Path, fail_silently: bool = False) -> list[ExtractedCommit]:
     """
     Call and parse git log. This function requires that git>=2.37.1 is installed on your system.
 
