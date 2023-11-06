@@ -8,3 +8,4 @@
 | `tqdm_utils`       | tqdm                     |
 | `downloader`       | tqdm, requests           |
 | `scientific_utils` | numpy, numba, matplotlib |
+| `git_utils`        | dateutil                 |
