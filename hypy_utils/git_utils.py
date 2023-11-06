@@ -4,7 +4,7 @@ from pathlib import Path
 from subprocess import check_output
 from typing import NamedTuple
 
-import dateutil
+import dateutil.parser
 
 
 class ExtractedCommit(NamedTuple):
