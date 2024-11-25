@@ -84,3 +84,19 @@ def deep_dict(o: object, exclude: set | None):
     if isinstance(o, list):
         return [deep_dict(v, exclude) for v in o]
     return o
+
+
+def get_rec(cd: dict, key: str):
+    """
+    :param cd: Dictionary
+    :param key: Recursive key in the format of keya.keyb.keyc...
+    """
+    if '.' not in key:
+        return cd.get(key)
+
+    ks = key.split('.')
+    while len(ks) > 0:
+        cd = cd.get(ks.pop(0))
+        if cd is None:
+            break
+    return cd
