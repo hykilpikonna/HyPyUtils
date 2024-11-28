@@ -1,3 +1,4 @@
+import pickle
 from pathlib import Path
 
 import zstandard as zstd
@@ -5,7 +6,7 @@ import orjson
 
 
 zstd_d = zstd.ZstdDecompressor()
-zstd_c = zstd.ZstdCompressor(level=15, write_checksum=True, threads=-1)
+zstd_c = zstd.ZstdCompressor(level=5, write_checksum=True, threads=-1)
 
 
 def load_json_zst(file_path: str | Path) -> dict | list:
@@ -33,6 +34,17 @@ def write_json_zst(file_path: str | Path, data: dict | list, **kwargs):
     Path(file_path).write_bytes(zstd_c.compress(orjson.dumps(data, **kwargs)))
 
 
+def load_pickle_zst(file_path: str | Path) -> object:
+    with Path(file_path).open('rb') as f:
+        return pickle.loads(zstd_d.stream_reader(f).read())
+
+
+def write_pickle_zst(file_path: str | Path, data: object):
+    Path(file_path).write_bytes(zstd_c.compress(pickle.dumps(data)))
+
+
 if __name__ == '__main__':
+    write_pickle_zst('test.pickle.zst', {'a': 1, 'b': 2})
+    assert load_pickle_zst('test.pickle.zst') == {'a': 1, 'b': 2}
     write_json_zst('test.json.zst', {'a': 1, 'b': 2})
     assert load_json_zst('test.json.zst') == {'a': 1, 'b': 2}
