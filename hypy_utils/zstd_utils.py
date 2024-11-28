@@ -4,6 +4,7 @@ from pathlib import Path
 import zstandard as zstd
 import orjson
 
+from . import write
 
 zstd_d = zstd.ZstdDecompressor()
 zstd_c = zstd.ZstdCompressor(level=5, write_checksum=True, threads=-1)
@@ -31,16 +32,16 @@ def write_json_zst(file_path: str | Path, data: dict | list, **kwargs):
         file_path (str): The path to the .json.zst file.
         data (dict or list): The data to dump.
     """
-    Path(file_path).write_bytes(zstd_c.compress(orjson.dumps(data, **kwargs)))
+    write(file_path, zstd_c.compress(orjson.dumps(data, **kwargs)))
 
 
-def load_pickle_zst(file_path: str | Path) -> object:
+def load_pickle_zst(file_path: str | Path):
     with Path(file_path).open('rb') as f:
         return pickle.loads(zstd_d.stream_reader(f).read())
 
 
-def write_pickle_zst(file_path: str | Path, data: object):
-    Path(file_path).write_bytes(zstd_c.compress(pickle.dumps(data)))
+def write_pickle_zst(file_path: str | Path, data):
+    write(file_path, zstd_c.compress(pickle.dumps(data)))
 
 
 if __name__ == '__main__':
