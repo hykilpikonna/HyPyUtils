@@ -14,8 +14,8 @@ Some modules have extra requirements that are not installed along with hypy_util
 | `scientific_utils` | numpy, numba, matplotlib |
 | `git_utils`        | dateutil                 |
 
-## BadBlocks - A bad block scanning utility for Linux
-
-![badblocks-2](docs/badblocks.png)
+## BadBlocks - HDD sector scanning for Linux
 
 Usage: `python3 -m hypy_utils.badblocks -d /dev/sda`
+
+![badblocks-2](docs/badblocks.png)
