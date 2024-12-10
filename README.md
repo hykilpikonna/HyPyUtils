@@ -1,7 +1,11 @@
 # HyPyUtils
  HyDEV Utils for Python
 
+`pip install hypy_utils`
+
 ## Modules
+
+Some modules have extra requirements that are not installed along with hypy_utils. These are listed below:
 
 | Module             | Requirements             |
 |--------------------|--------------------------|
@@ -10,9 +14,7 @@
 | `scientific_utils` | numpy, numba, matplotlib |
 | `git_utils`        | dateutil                 |
 
-## Utilities
-
-### BadBlocks - A bad block scanning utility for Linux
+## BadBlocks - A bad block scanning utility for Linux
 
 ![badblocks-2](docs/badblocks.png)
 
