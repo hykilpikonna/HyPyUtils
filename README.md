@@ -14,6 +14,6 @@
 
 ### BadBlocks - A bad block scanning utility for Linux
 
-Usage: `python3 -m hypy_utils.badblocks -d <device>`
+![badblocks-2](docs/badblocks.png)
 
-![img.png](docs/img.png)
+Usage: `python3 -m hypy_utils.badblocks -d /dev/sda`
