@@ -44,9 +44,10 @@ PetiteVue.createApp({
     d: { logs: [] }, // timestamp, duration, start_block, end_block, bad_blocks
     max_dur: 0, min_dur: 0, hover: null, firs: null, last: null,
     onInit() {
-        this.max_dur = Math.max(...this.d.logs.map(l => l.duration))
         this.min_dur = Math.min(...this.d.logs.map(l => l.duration))
-        this.max_dur = Math.min(this.max_dur, this.min_dur * 8)
+        // this.max_dur = Math.max(...this.d.logs.map(l => l.duration))
+        // this.max_dur = Math.min(this.max_dur, this.min_dur * 8)
+        this.max_dur = this.min_dur * 8
         console.log(`Min duration: ${this.min_dur}, Max duration: ${this.max_dur}`)
         this.first = this.d.logs[0]
         this.last = this.d.logs[this.d.logs.length - 1]
