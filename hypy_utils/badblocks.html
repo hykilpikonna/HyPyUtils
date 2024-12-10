@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="html5">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BadBlocks Scan Result for /dev/sda</title>
+    <script src="https://unpkg.com/petite-vue"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body v-scope @vue:mounted="mounted" class="p-4 relative flex flex-col gap-3">
+    <div>
+        <h1 class="text-2xl font-bold mb-4">BadBlocks Scan Result for /dev/sda</h1>
+        <p>Scan started on {{ first.timestamp }} and ended on {{ last?.timestamp }}.</p>
+        <p>
+            Total blocks: {{ last.end_block }} blocks | 
+            Block size: {{ d.block_size }} | 
+            Total size: <span class="text-red-500">{{ (last.end_block * d.block_size / 1_000_000_000_000).toFixed(2) }} TB</span>
+            <span class="text-gray-400">= {{ (last.end_block * d.block_size / 1024 / 1024 / 1024 / 1024).toFixed(2) }} TiB</span></p>
+        <p><span class="text-red-500">Red</span> blocks indicate bad blocks or blocks that take too long (8x normal time) to scan. Hover over a block to see more information.</p>
+        <p>Made with ♥ by <a href="https://github.com/hykilpikonna" class="text-red-500 underline">Azalea</a> | GitHub @ <a href="https://github.com/hykilpikonna/HyPyUtils" class="text-red-500 underline">hykilpikonna/HyPyUtils</a></p>
+    </div>
+
+    <div class="flex flex-wrap gap-0.5">
+        <div v-for="(log, index) in d.logs" :key="index" 
+            class="inline-block w-2 h-2"
+            :style="{backgroundColor: getBlockColor(log)}"
+            @mouseenter="showHoverInfo($event, log, index)" @mouseleave="hideHoverInfo"></div>
+    </div>
+    
+    <!-- Tooltip for showing hover information -->
+    <div v-if="hover" 
+        :style="{top: hover?.y + 'px', left: hover?.x + 'px'}"
+        class="absolute bg-gray-800 text-white text-sm rounded px-2 py-1 shadow-md pointer-events-none transition-opacity duration-150">
+        <p>Start: {{ hover?.l?.start_block?.toString(16) }}</p>
+        <p>End: {{ hover?.l?.end_block?.toString(16) }}</p>
+        <p>Duration: {{ hover?.l?.duration?.toFixed(2) }}</p>
+    </div>
+</body>
+
+<script>
+PetiteVue.createApp({
+    d: { logs: [] }, // timestamp, duration, start_block, end_block, bad_blocks
+    max_dur: 0, min_dur: 0, hover: null, firs: null, last: null,
+    onInit() {
+        this.max_dur = Math.max(...this.d.logs.map(l => l.duration))
+        this.min_dur = Math.min(...this.d.logs.map(l => l.duration))
+        this.max_dur = Math.min(this.max_dur, this.min_dur * 8)
+        console.log(`Min duration: ${this.min_dur}, Max duration: ${this.max_dur}`)
+        this.first = this.d.logs[0]
+        this.last = this.d.logs[this.d.logs.length - 1]
+    },
+    mounted() {
+        if (this.d.logs.length) return this.onInit() // For injecting data from server-side
+        fetch('http://localhost:8080/badblocks_log__dev_sda.json').then(resp => resp.json())
+            .then(data => { this.d = data; this.onInit() })
+    },
+    getBlockColor(log) {
+        if (log.bad_blocks.length) return 'red'
+        const ratio = 1 - ((log.duration - this.min_dur) / (this.max_dur - this.min_dur))
+        return `rgb(${Math.round(255 * (1 - ratio))}, ${Math.round(255 * ratio)}, 0)`
+    },
+    showHoverInfo(event, log, index) {
+        const rect = event.target.getBoundingClientRect();
+        this.hover = { l: log,
+            x: rect.left + window.scrollX + 10,
+            y: rect.top + window.scrollY - 30
+        }
+    },
+    hideHoverInfo() { this.hover = null }
+}).mount()
+</script>
+</html>
