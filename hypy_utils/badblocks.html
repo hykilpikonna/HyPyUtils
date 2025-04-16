@@ -44,13 +44,20 @@ PetiteVue.createApp({
     d: { logs: [] }, // timestamp, duration, start_block, end_block, bad_blocks
     max_dur: 0, min_dur: 0, hover: null, firs: null, last: null,
     onInit() {
-        this.min_dur = Math.min(...this.d.logs.map(l => l.duration))
-        // this.max_dur = Math.max(...this.d.logs.map(l => l.duration))
-        // this.max_dur = Math.min(this.max_dur, this.min_dur * 8)
-        this.max_dur = this.min_dur * 8
-        console.log(`Min duration: ${this.min_dur}, Max duration: ${this.max_dur}`)
-        this.first = this.d.logs[0]
-        this.last = this.d.logs[this.d.logs.length - 1]
+        // Extract all durations and sort them
+        const durations = this.d.logs.map(l => l.duration).sort((a, b) => a - b);
+    
+        // Compute Q1 index; you can choose to do an interpolation if you need higher accuracy
+        const q1Index = Math.floor(durations.length * 0.25);
+    
+        // Use Q1 as our new "min"
+        this.min_dur = durations[q1Index];
+        this.max_dur = this.min_dur * 8;
+    
+        console.log(`Q1 duration: ${this.min_dur}, Max duration: ${this.max_dur}`);
+    
+        this.first = this.d.logs[0];
+        this.last = this.d.logs[this.d.logs.length - 1];
     },
     mounted() {
         if (this.d.logs.length) return this.onInit() // For injecting data from server-side
